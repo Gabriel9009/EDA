@@ -24,6 +24,32 @@ A Streamlit web application for automated exploratory data analysis (EDA) with i
 - Python 3.8 or higher
 - Recommended: Create and activate a virtual environment
 
+### Usage
+- Upload a CSV or Excel file.
+- Explore your data with previews, statistics, and visualizations.
+- Review missing data and select imputation strategies.
+- Perform linear regression by selecting a numeric target variable.
+- Generate and download an in-depth Sweetviz EDA report.
+
+### Dependencies
+Key packages used:
+- streamlit
+- pandas
+- numpy
+- seaborn
+- matplotlib
+- plotly
+- scikit-learn
+- sweetviz
+
+For the full list, see requirements.txt.
+
+### License
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+### Author
+### Gabriel
+
 ### Installation
 
 1. Clone this repository:
@@ -31,3 +57,5 @@ A Streamlit web application for automated exploratory data analysis (EDA) with i
 ```bash
 git clone https://github.com/Gabriel9009/EDA.git
 cd EDA
+
+
