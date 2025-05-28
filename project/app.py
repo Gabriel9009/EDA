@@ -15,7 +15,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 # Configure page
 st.set_page_config(page_title="Auto EDA Tool with Missing Data Assistant", layout="wide")
-st.title("📊 Auto EDA Tool with Missing Data Assistant")
+st.title("📊 Auto EDA Tool")
 st.markdown("Upload your CSV or Excel file to explore your data and handle missing values.")
 
 # File uploader
@@ -188,58 +188,7 @@ if uploaded_file:
                             labels={'Abs Coefficient': 'Importance'})
             st.plotly_chart(fig_coef, use_container_width=True)
 
-    # Advanced Data Profiling
-    st.subheader("🔍 Advanced Data Profiling")
-    if st.checkbox("Show detailed column information"):
-        profile_df = pd.DataFrame({
-            'Column': df.columns,
-            'Data Type': df.dtypes,
-            'Unique Values': df.nunique(),
-            'Missing Values': df.isnull().sum(),
-            'Missing %': (df.isnull().sum() / len(df) * 100).round(2),
-            'Sample Values': [df[col].dropna().sample(min(3, len(df))).tolist() for col in df.columns]
-        })
-        st.dataframe(profile_df)
-
    
-    # Data Transformation
-    st.subheader("🛠 Data Transformation")
-    transform_col = st.selectbox("Select column to transform:", df.columns)
-    
-    col1, col2 = st.columns(2)
-    with col1:
-        transform_type = st.selectbox(
-            "Transformation type:",
-            options=["Log", "Square root", "Normalize", "Standardize", "One-hot encode"]
-        )
-    with col2:
-        if transform_type in ["Log", "Square root"]:
-            if pd.api.types.is_numeric_dtype(df[transform_col]):
-                new_col_name = st.text_input("New column name:", f"{transform_col}_{transform_type.lower()}")
-            else:
-                st.warning("Selected transformation only works for numeric columns")
-        else:
-            new_col_name = st.text_input("New column name:", f"{transform_col}_{transform_type.lower()}")
-    
-    if st.button("Apply Transformation"):
-        try:
-            if transform_type == "Log":
-                df[new_col_name] = np.log1p(df[transform_col])
-            elif transform_type == "Square root":
-                df[new_col_name] = np.sqrt(df[transform_col])
-            elif transform_type == "Normalize":
-                df[new_col_name] = (df[transform_col] - df[transform_col].min()) / (df[transform_col].max() - df[transform_col].min())
-            elif transform_type == "Standardize":
-                df[new_col_name] = (df[transform_col] - df[transform_col].mean()) / df[transform_col].std()
-            elif transform_type == "One-hot encode":
-                encoded = pd.get_dummies(df[transform_col], prefix=transform_col)
-                df = pd.concat([df, encoded], axis=1)
-            
-            st.success(f"Transformation applied successfully!")
-            st.dataframe(df.head())
-        except Exception as e:
-            st.error(f"Error applying transformation: {str(e)}")
-
     # Sweetviz Report
     st.subheader("🧠 Sweetviz Full EDA Report")
     if st.button("Generate Sweetviz Report"):
