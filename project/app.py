@@ -32,6 +32,12 @@ if uploaded_file:
         st.error(f"❌ Error reading file: {e}")
         st.stop()
 
+    # Early check for mixed-type columns
+    mixed_cols = [col for col in df.columns if df[col].apply(type).nunique() > 1]
+    if mixed_cols:
+        st.warning(f"⚠️ Warning: Mixed-type columns detected: {', '.join(mixed_cols)}")
+        st.info("These columns will be automatically converted to string type for analysis.")
+
     st.subheader("🔍 Data Preview (first 5 rows)")
     st.dataframe(df.head())
 
@@ -131,68 +137,4 @@ if uploaded_file:
 
     if target:
         st.write(f"Selected target: **{target}**")
-        features = [col for col in numeric_cols if col != target]
-
-        if not features:
-            st.warning("No numeric features available for regression besides the target.")
-        else:
-            X = df[features].copy()
-            y = df[target].copy()
-
-            X = X.fillna(X.mean())
-            y = y.fillna(y.mean())
-
-            scaler = StandardScaler()
-            X_scaled = scaler.fit_transform(X)
-
-            X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
-
-            model = LinearRegression()
-            model.fit(X_train, y_train)
-
-            coefs = model.coef_
-            coef_df = pd.DataFrame({
-                "Feature": features,
-                "Coefficient": coefs,
-                "Abs Coefficient": np.abs(coefs)
-            }).sort_values(by="Abs Coefficient", ascending=False)
-
-            st.write("### Regression Coefficients (standardized features):")
-            st.dataframe(coef_df[["Feature", "Coefficient"]].style.format({"Coefficient": "{:.4f}"}))
-
-            y_pred = model.predict(X_test)
-            mae = mean_absolute_error(y_test, y_pred)
-            mse = mean_squared_error(y_test, y_pred)
-            rmse = np.sqrt(mse)
-            r2 = r2_score(y_test, y_pred)
-
-            st.markdown(f"""
-                **Model Performance:**
-                - MAE: `{mae:.4f}`
-                - MSE: `{mse:.4f}`
-                - RMSE: `{rmse:.4f}`
-                - R² Score: `{r2:.4f}`
-            """)
-
-            top_feature = coef_df.iloc[0]
-            st.success(f"Most powerful predictor: **{top_feature['Feature']}** with coefficient {top_feature['Coefficient']:.4f}")
-
-    # Sweetviz Report
-    st.subheader("🧠 Sweetviz Full EDA Report")
-    if st.button("Generate Sweetviz Report"):
-        with st.spinner("Generating Sweetviz report..."):
-            report = sv.analyze(df)
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".html") as tmp_file:
-                report.show_html(tmp_file.name)
-                html_file = tmp_file.name
-
-            with open(html_file, "r", encoding="utf-8") as f:
-                html_content = f.read()
-
-            components.html(html_content, height=1000, scrolling=True)
-            # Convert HTML to base64
-            b64 = base64.b64encode(html_content.encode()).decode()
-
-            # Create a download link
-            href = f'<a href="data:text/html;base64,{b64}" download="sweetviz_report.html">📥 Download Sweetviz Report</a>'
-            st.markdown(href, unsafe_allow_html=True)
+        features = [col for
