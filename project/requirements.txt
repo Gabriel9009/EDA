@@ -1,6 +1,6 @@
 streamlit==1.45.1
 pandas==2.2.3
-numpy==1.23.5
+numpy>=1.26.0,<2.2.0
 sweetviz==2.3.1
 seaborn==0.13.2
 matplotlib==3.10.0
